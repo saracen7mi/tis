@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INO BiH | Analiza Stanja u Kosturnicama 2026.</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #1f2937;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header {
+            background: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 35px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--text-main);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        .container {
+            max-width: 1450px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: var(--text-main);
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .btn-add {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-add:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            background: #0b0f19;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            max-height: 680px;
+            overflow-y: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        th {
+            color: var(--text-muted);
+            background-color: #1a2332;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .comment-cell {
+            color: #d1d5db;
+            font-style: italic;
+            background: rgba(11, 15, 25, 0.4);
+            min-width: 220px;
+            line-height: 1.4;
+        }
+
+        .btn-edit {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit:hover {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .tag {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .tag-sent { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .tag-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .tag-check { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 520px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+
+        .modal-content select, .modal-content input, .modal-content textarea {
+            width: 100%;
+            background: #0b0f19;
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 10px;
+            padding: 12px;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(isSubmitting) { loadData(); isSubmitting=false; }"></iframe>
+
+    <header>
+        <h1>🏛️ INO BiH — Terenski Ured Sarajevo</h1>
+        <p>Analiza stanja u kosturnicama prema reviziji ICMP-a i evidencija po predmetu</p>
+    </header>
+
+    <div class="container">
+
+        <div class="card">
+            <div class="header-actions">
+                <h2>📋 Svi slučajevi (Tabela 2 i Tabela 3)</h2>
+                <button class="btn-add" onclick="openAddModal()">➕ Dodaj novi slučaj</button>
+            </div>
+
+            <input type="text" id="searchSlucajevi" class="search-bar" placeholder="🔍 Pretraži po broju slučaja, lokaciji, osobi, opasci ili komentarima..." onkeyup="filterSlucajevi()">
+            
+            <div class="table-responsive">
+                <table id="tblSlucajevi">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">Slučaj / ID</th>
+                            <th>Lokacija</th>
+                            <th>Osoba / Identitet</th>
+                            <th>Status Zahtjeva (OJT I.S.)</th>
+                            <th>ICMP Opaska</th>
+                            <th style="width: 250px;">Komentar / Datum izmjene</th>
+                            <th style="width: 90px; text-align: center;">Akcija</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal za izmjenu predmeta -->
+    <div id="commentModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color: var(--text-main);" id="modalPredmetTitle">Ažuriraj predmet</h3>
+            <form id="commentForm" action="" method="GET" target="hidden_iframe" onsubmit="submitForm()">
+                <input type="hidden" name="action" id="modalAction" value="updateRecord">
+                <input type="hidden" name="id" id="modalId">
+                
+                <div id="newRecordFields" style="display: none;">
+                    <label style="font-size:0.85rem; color:var(--text-muted);">Slučaj / ID (Npr. Slučaj br. 7 ili Predmet #43):</label>
+                    <input type="text" name="newId" id="modalNewId" placeholder="Oznaka...">
+                    
+                    <label style="font-size:0.85rem; color:var(--text-muted);">Lokacija:</label>
+                    <input type="text" name="newLokacija" id="modalNewLokacija" placeholder="Naziv lokacije...">
+
+                    <label style="font-size:0.85rem; color:var(--text-muted);">Osoba / Identitet:</label>
+                    <input type="text" name="newOsoba" id="modalNewOsoba" placeholder="Ime i prezime...">
+                </div>
+
+                <label style="font-size:0.85rem; color:var(--text-muted);">Status predmeta:</label>
+                <select name="status" id="modalStatusSelect">
+                    <option value="Poslato OJT I.S. (2025)">Poslato OJT I.S. (2025)</option>
+                    <option value="Potrebna reasocijacija">Potrebna reasocijacija</option>
+                    <option value="Čeka kontakte">Čeka kontakte</option>
+                    <option value="Ukopan">Ukopan</option>
+                    <option value="Identifikovan">Identifikovan</option>
+                    <option value="U toku / Provjera">U toku / Provjera</option>
+                    <option value="Odbijeno od porodice">Odbijeno od porodice</option>
+                </select>
+
+                <label style="font-size:0.85rem; color:var(--text-muted);">ICMP Opaska / Stanje skeleta:</label>
+                <input type="text" name="opaska" id="modalOpaskaText" placeholder="Unesite opasku...">
+
+                <label style="font-size:0.85rem; color:var(--text-muted);">Komentar / Napomena (automatski bilježi datum):</label>
+                <textarea name="komentar" id="modalKomentarText" placeholder="Upišite napomenu..." required></textarea>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-edit" style="background:transparent; color:var(--text-muted); border-color:var(--border);" onclick="closeModal()">Otkaži</button>
+                    <button type="submit" class="btn-edit" style="background:var(--accent); color:white;">Spremi 💾</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>Institut za nestale osobe BiH — Terenski ured Sarajevo | Istražitelj Mirza Saračević</p>
+    </footer>
+
+    <script>
+        const SCRIPT_URL = "TVOJ_APPS_SCRIPT_URL_OVDE";
+        let isSubmitting = false;
+
+        // Kompletni podaci sa svim slučajevima iz izvještaja
+        let sviSlucajevi = [
+            // TABELA 2 SLUČAJEVI
+            { id: "Slučaj br. 1", lokacija: "Bećari - Sokolac Br. 12", osoba: "Mješane kosti", status: "Potrebna reasocijacija", opaska: "Mješane kosti", komentar: "" },
+            { id: "Slučaj br. 2", lokacija: "Đurevića Polje IV br. 67", osoba: "Ribac (Emin) Osman", status: "Identifikovan", opaska: "Identifikovan 19.5.2023.", komentar: "" },
+            { id: "Slučaj br. 3", lokacija: "Višegrad, Tatinica 334", osoba: "Barukčić (Mehmed) Hasan ili Zijad", status: "Potrebna reasocijacija", opaska: "Provjera predmeta", komentar: "" },
+            { id: "Slučaj br. 4", lokacija: "Kurtalići 300", osoba: "Gacka Bekto", status: "Potrebna reasocijacija", opaska: "Pregled kosturnice", komentar: "" },
+            { id: "Slučaj br. 5", lokacija: "Đurevića Polje IX 159", osoba: "Selimović (Omer) Ibrahim", status: "Potrebna reasocijacija", opaska: "Reasocijacija", komentar: "" },
+            { id: "Slučaj br. 6", lokacija: "Đurevići, Đurevića Polje 154", osoba: "Turković (Asim) Asima", status: "Identifikovan", opaska: "Identifikovan", komentar: "" },
+            
+            // TABELA 3 SLUČAJEVI (Svih 42 iz izvještaja)
+            { id: "Predmet #1", lokacija: "Donje Štitarevo 306 / 201 / IIA 199", osoba: "Turudić (Meho) Vasvija", status: "Poslato OJT I.S. (2025)", opaska: "Nije pogodan za DNK / Nema više skeleta", komentar: "Poslat zahtjev OJT I.S. 2025" },
+            { id: "Predmet #2", lokacija: "Nikolići 345", osoba: "Selman (Ibro) Ševko ili 2", status: "Čeka kontakte", opaska: "NISMO NAŠLI KONTAKTE PORODICE", komentar: "" },
+            { id: "Predmet #3", lokacija: "Nikolići Br. 344", osoba: "Hasić (Hasan) Kasim", status: "Ukopan", opaska: "Ukopan 25.5.2023. (NEMA KONTAKATA)", komentar: "" },
+            { id: "Predmet #4", lokacija: "Nikolići Br. 344", osoba: "Beširević (Redžo) Hanifa", status: "Poslato OJT I.S. (2025)", opaska: "Zahtjev za reasocijaciju poslat 2025", komentar: "" },
+            { id: "Predmet #5", lokacija: "Stari Brod 104", osoba: "Hasečić Hana", status: "Čeka kontakte", opaska: "Provjeriti kontakte", komentar: "" },
+            { id: "Predmet #6", lokacija: "Stari Brod Sektor D 364", osoba: "Osmanagić Arip Šukrija", status: "Potrebna reasocijacija", opaska: "Mješane kosti", komentar: "" },
+            { id: "Predmet #7", lokacija: "Donje Štitarevo 274", osoba: "Cocalić (Gamil) Ramiz", status: "Poslato OJT I.S. (2025)", opaska: "Zahtjev poslat 2025", komentar: "" },
+            { id: "Predmet #8", lokacija: "Donje Štitarevo 325", osoba: "Kešmer (Osman) Nusret", status: "Čeka kontakte", opaska: "Provjeriti kontakte", komentar: "" },
+            { id: "Predmet #9", lokacija: "Donje Štitarevo 348", osoba: "Ahmetspahić (Hamed) Jasmina", status: "Odbijeno od porodice", opaska: "Sin Hamed ne želi reasocijaciju", komentar: "Sin izričito odbio" },
+            { id: "Predmet #10", lokacija: "Hrtar Grad 150", osoba: "Imamagić (Uzeir) Muharem", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #11", lokacija: "Donje Štitarevo 335", osoba: "Zukić (Medo) Sehija", status: "U toku / Provjera", opaska: "Provjeriti kosti u g.g. Visoko", komentar: "" },
+            { id: "Predmet #12", lokacija: "Donje Štitarevo 335", osoba: "Ahmed (Hasan) Hamed", status: "U toku / Provjera", opaska: "Provjeriti kosti u g.g. Visoko", komentar: "" },
+            { id: "Predmet #13", lokacija: "Hrtar Grad 147", osoba: "Imamagić (Uzeir) Ahmed", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #14", lokacija: "Kurtalići, Višegrad 228", osoba: "Mamledžija (Avdija) Sabit", status: "Poslato OJT I.S. (2025)", opaska: "Zahtjev poslat 2025", komentar: "" },
+            { id: "Predmet #15", lokacija: "Kurtalići, Višegrad 234", osoba: "Šišić (Ibro) Ibrahim", status: "Čeka kontakte", opaska: "Provjeriti kontakte", komentar: "" },
+            { id: "Predmet #16", lokacija: "Nikolići 3-B 295 MK", osoba: "Jašarević (Asim) Muhamed", status: "U toku / Provjera", opaska: "Mješane kosti", komentar: "" },
+            { id: "Predmet #17", lokacija: "Nikolići IV 297", osoba: "Dizdarević (Meho) Ibrahim", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #18", lokacija: "Paočići, Višegrad - Br. 190", osoba: "Branković (Idriz) Devleta", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #19", lokacija: "Đurevića Polje Br. 361", osoba: "Smajlović (Nesib) Nesiba", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #20", lokacija: "Bećari - Sokolac Br. 13", osoba: "Miješane kosti", status: "Potrebna reasocijacija", opaska: "Miješane kosti", komentar: "" },
+            { id: "Predmet #21-22", lokacija: "Bećari - Sokolac Br. 14", osoba: "Murtić (Indira) Memiš", status: "U toku / Provjera", opaska: "Reasocirano (Svi Murtići 21-26)", komentar: "Murtići reasocirani" },
+            { id: "Predmet #23", lokacija: "Bećari - Sokolac Br. 3", osoba: "Murtić (Mušan) Hasiba", status: "U toku / Provjera", opaska: "Reasocirano (Svi Murtići 21-26)", komentar: "Murtići reasocirani" },
+            { id: "Predmet #24-25", lokacija: "Bećari - Sokolac Br. 7", osoba: "Murtić familija", status: "U toku / Provjera", opaska: "Reasocirano (Svi Murtići 21-26)", komentar: "Murtići reasocirani" },
+            { id: "Predmet #26", lokacija: "Bećari - Sokolac Br. 9", osoba: "Murtić (Ahmed) Rifet", status: "U toku / Provjera", opaska: "Reasocirano (Svi Murtići 21-26)", komentar: "Murtići reasocirani" },
+            { id: "Predmet #27", lokacija: "Đurevića Polje, Višegrad 164", osoba: "Kurspahić Hidajet", status: "Poslato OJT I.S. (2025)", opaska: "Zahtjev poslat 2025", komentar: "" },
+            { id: "Predmet #28", lokacija: "Kurtalići, Višegrad 226", osoba: "Smajić (Mušan) Muhidin", status: "Poslato OJT I.S. (2025)", opaska: "Zahtjev poslat 2025", komentar: "" },
+            { id: "Predmet #29", lokacija: "Kurtalići, Višegrad 226", osoba: "Ribac (Ibrahim) Nedžad", status: "Poslato OJT I.S. (2025)", opaska: "Zahtjev poslat 2025", komentar: "" },
+            { id: "Predmet #30", lokacija: "Kurtalići, Višegrad 226", osoba: "Hodžić (Abdulrahman) Avdija", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #31", lokacija: "Kurtalići, Višegrad 226", osoba: "Memišević (Jusuf) Habib", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #32", lokacija: "Kurtalići, Višegrad 23", osoba: "Demir (Meho) Hamzo", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #33", lokacija: "Kurtalići, Višegrad 233", osoba: "Veljan (Delija) Ismet", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #34", lokacija: "Kurtalići, Višegrad 238", osoba: "Vila (Mustafa) Nermin", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #35", lokacija: "Kurtalići, Višegrad 245", osoba: "Zukić (Mehmed) Džemail", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #36", lokacija: "Kurtalići, Višegrad 246", osoba: "Kadrić (Ramo) Mustafa", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #37", lokacija: "Lugova Ravan / Žepa 321", osoba: "Šutrović (Osman) Mujo", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #38", lokacija: "Luka, Žepa 323", osoba: "Kešmer (Ibro) Sulejman", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #39", lokacija: "Nikolići 342", osoba: "Imamagić Aiša", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #40", lokacija: "Perućac, Kurtalići", osoba: "Džafić (Zajko) Faid", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #41", lokacija: "Perućac, Kurtalići", osoba: "Tabaković (Abid) Fehim", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" },
+            { id: "Predmet #42", lokacija: "Stari Brod Sektor B Br. 93", osoba: "Smajlović (Hadžib) Ohran", status: "U toku / Provjera", opaska: "Pregled prema ICMP reviziji", komentar: "" }
+        ];
+
+        function renderTable() {
+            let tbody = document.querySelector('#tblSlucajevi tbody');
+            tbody.innerHTML = '';
+            sviSlucajevi.forEach(item => {
+                let row = tbody.insertRow();
+                let isSent = item.status.includes("2025");
+                let tagClass = isSent ? "tag-sent" : (item.status.includes("Odbijeno") ? "tag-check" : "tag-pending");
+
+                row.innerHTML = `
+                    <td><strong>${item.id}</strong></td>
+                    <td>${item.lokacija}</td>
+                    <td>${item.osoba}</td>
+                    <td><span class="tag ${tagClass}">${item.status}</span></td>
+                    <td><small style="color:var(--text-muted);">${item.opaska || '-'}</small></td>
+                    <td class="comment-cell">${item.komentar || '<span style="color:var(--text-muted); font-size:0.8rem;">— nema komentara —</span>'}</td>
+                    <td style="text-align: center;"><button class="btn-edit" onclick="openModal('${item.id}', '${item.status}', '${item.opaska || ''}', '${item.komentar || ''}')">✏️ Uredi</button></td>
+                `;
+            });
+        }
+
+        function filterSlucajevi() {
+            let input = document.getElementById('searchSlucajevi').value.toLowerCase();
+            let rows = document.querySelectorAll('#tblSlucajevi tbody tr');
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
+        function openModal(id, trenStatus, trenOpaska, postojeciKomentar) {
+            document.getElementById('modalAction').value = "updateRecord";
+            document.getElementById('newRecordFields').style.display = "none";
+            document.getElementById('modalId').value = id;
+            document.getElementById('modalPredmetTitle').innerText = `Ažuriraj predmet (${id})`;
+            document.getElementById('modalStatusSelect').value = trenStatus;
+            document.getElementById('modalOpaskaText').value = trenOpaska;
+            document.getElementById('modalKomentarText').value = postojeciKomentar;
+            document.getElementById('commentModal').style.display = 'flex';
+            
+            if(SCRIPT_URL !== "TVOJ_APPS_SCRIPT_URL_OVDE") {
+                document.getElementById('commentForm').action = SCRIPT_URL;
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('modalAction').value = "addRecord";
+            document.getElementById('newRecordFields').style.display = "block";
+            document.getElementById('modalPredmetTitle').innerText = "➕ Unesi novi slučaj";
+            document.getElementById('modalNewId').value = "Predmet #" + (sviSlucajevi.length + 1);
+            document.getElementById('modalNewLokacija').value = "";
+            document.getElementById('modalNewOsoba').value = "";
+            document.getElementById('modalOpaskaText').value = "";
+            document.getElementById('modalKomentarText').value = "";
+            document.getElementById('commentModal').style.display = 'flex';
+
+            if(SCRIPT_URL !== "TVOJ_APPS_SCRIPT_URL_OVDE") {
+                document.getElementById('commentForm').action = SCRIPT_URL;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('commentModal').style.display = 'none';
+        }
+
+        function submitForm() {
+            isSubmitting = true;
+            let actionType = document.getElementById('modalAction').value;
+            let datumSada = new Date().toLocaleString("bs-BA");
+
+            if(actionType === "addRecord") {
+                let newId = document.getElementById('modalNewId').value || "Novi slučaj";
+                let newLok = document.getElementById('modalNewLokacija').value || "-";
+                let newOsoba = document.getElementById('modalNewOsoba').value || "-";
+                let novStatus = document.getElementById('modalStatusSelect').value;
+                let novaOpaska = document.getElementById('modalOpaskaText').value;
+                let novKomentar = document.getElementById('modalKomentarText').value;
+                let punKomentar = novKomentar + ` (Kreirano: ${datumSada})`;
+
+                sviSlucajevi.unshift({
+                    id: newId,
+                    lokacija: newLok,
+                    osoba: newOsoba,
+                    status: novStatus,
+                    opaska: novaOpaska,
+                    komentar: punKomentar
+                });
+            } else {
+                let id = document.getElementById('modalId').value;
+                let novStatus = document.getElementById('modalStatusSelect').value;
+                let novaOpaska = document.getElementById('modalOpaskaText').value;
+                let novKomentar = document.getElementById('modalKomentarText').value;
+                let punKomentar = novKomentar + ` (Ažurirano: ${datumSada})`;
+
+                let item = sviSlucajevi.find(x => String(x.id) === String(id));
+                if (item) { 
+                    item.status = novStatus; 
+                    item.opaska = novaOpaska;
+                    item.komentar = punKomentar; 
+                }
+            }
+
+            renderTable();
+            setTimeout(() => {
+                closeModal();
+            }, 300);
+        }
+
+        function loadData() {
+            if(SCRIPT_URL === "https://script.google.com/macros/s/AKfycbzn3EeH7BU0t2AwRRe_f-2lwpul3Asa5SCtigr026Ak4kfbLCnQ5t6cTUyjSpjtdsQ/exec") return;
+            fetch(SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.slucajevi && data.slucajevi.length > 0) sviSlucajevi = data.slucajevi;
+                    renderTable();
+                });
+        }
+
+        window.onload = function() {
+            renderTable();
+            loadData();
+        };
+    </script>
+</body>
+</html>
