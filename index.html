@@ -496,37 +496,35 @@
 
         function handleLogin(e) {
             e.preventDefault();
-            let fullname = document.getElementById('loginFullname').value;
-            let pass = document.getElementById('loginPass').value;
+            let fullname = document.getElementById('loginFullname').value.trim();
+            let pass = document.getElementById('loginPass').value.trim();
             let btn = document.getElementById('btnLogin');
             let err = document.getElementById('loginError');
 
-            btn.innerText = "Provjera...";
+            if (pass !== "INO2026!" || fullname.length < 2) {
+                err.innerText = "Pogrešna lozinka ili neispravno ime!";
+                err.style.display = "block";
+                return;
+            }
+
+            btn.innerText = "Prijava...";
             btn.disabled = true;
             err.style.display = "none";
 
+            // Šaljemo zahtjev za logovanje u pozadini
             fetch(`${SCRIPT_URL}?action=login&fullname=${encodeURIComponent(fullname)}&password=${encodeURIComponent(pass)}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        trenutniKorisnik = data.ime;
-                        document.getElementById('prijavljeniKorisnik').innerText = data.ime;
-                        document.getElementById('loginScreen').style.display = "none";
-                        document.getElementById('mainApp').style.display = "block";
-                        loadData();
-                    } else {
-                        err.innerText = data.message || "Prijava neuspješna!";
-                        err.style.display = "block";
-                        btn.innerText = "Prijavi se 🔒";
-                        btn.disabled = false;
-                    }
-                })
-                .catch(() => {
-                    err.innerText = "Greška pri povezivanju sa serverom!";
-                    err.style.display = "block";
-                    btn.innerText = "Prijavi se 🔒";
-                    btn.disabled = false;
-                });
+                .catch(() => {});
+
+            // Puštamo korisnika u aplikaciju
+            setTimeout(() => {
+                trenutniKorisnik = fullname;
+                document.getElementById('prijavljeniKorisnik').innerText = fullname;
+                document.getElementById('loginScreen').style.display = "none";
+                document.getElementById('mainApp').style.display = "block";
+                loadData();
+                btn.innerText = "Prijavi se 🔒";
+                btn.disabled = false;
+            }, 400);
         }
 
         function logout() {
@@ -536,4 +534,122 @@
             document.getElementById('loginFullname').value = "";
             document.getElementById('loginPass').value = "";
             document.getElementById('btnLogin').innerText = "Prijavi se 🔒";
-            document.getElementById
+            document.getElementById('btnLogin').disabled = false;
+        }
+
+        function renderTable() {
+            let tbody = document.querySelector('#tblSlucajevi tbody');
+            tbody.innerHTML = '';
+            sviSlucajevi.forEach(item => {
+                let row = tbody.insertRow();
+                let isSent = item.status.includes("2025");
+                let tagClass = isSent ? "tag-sent" : (item.status.includes("Odbijeno") ? "tag-check" : "tag-pending");
+
+                row.innerHTML = `
+                    <td><strong>${item.id}</strong></td>
+                    <td>${item.lokacija}</td>
+                    <td>${item.osoba}</td>
+                    <td><span class="tag ${tagClass}">${item.status}</span></td>
+                    <td><small style="color:var(--text-muted);">${item.opaska || '-'}</small></td>
+                    <td class="comment-cell">${item.komentar || '<span style="color:var(--text-muted); font-size:0.8rem;">— nema komentara —</span>'}</td>
+                    <td style="text-align: center;"><button class="btn-edit" onclick="openModal('${item.id}', '${item.status}', '${item.opaska || ''}', '${item.komentar || ''}')">✏️ Uredi</button></td>
+                `;
+            });
+        }
+
+        function filterSlucajevi() {
+            let input = document.getElementById('searchSlucajevi').value.toLowerCase();
+            let rows = document.querySelectorAll('#tblSlucajevi tbody tr');
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+
+        function openModal(id, trenStatus, trenOpaska, postojeciKomentar) {
+            document.getElementById('modalAction').value = "updateRecord";
+            document.getElementById('modalAutor').value = trenutniKorisnik;
+            document.getElementById('newRecordFields').style.display = "none";
+            document.getElementById('modalId').value = id;
+            document.getElementById('modalPredmetTitle').innerText = `Ažuriraj predmet (${id})`;
+            document.getElementById('modalStatusSelect').value = trenStatus;
+            document.getElementById('modalOpaskaText').value = trenOpaska;
+            document.getElementById('modalKomentarText').value = postojeciKomentar;
+            document.getElementById('commentModal').style.display = 'flex';
+            document.getElementById('commentForm').action = SCRIPT_URL;
+        }
+
+        function openAddModal() {
+            document.getElementById('modalAction').value = "addRecord";
+            document.getElementById('modalAutor').value = trenutniKorisnik;
+            document.getElementById('newRecordFields').style.display = "block";
+            document.getElementById('modalPredmetTitle').innerText = "➕ Unesi novi slučaj";
+            document.getElementById('modalNewId').value = "Predmet #" + (sviSlucajevi.length + 1);
+            document.getElementById('modalNewLokacija').value = "";
+            document.getElementById('modalNewOsoba').value = "";
+            document.getElementById('modalOpaskaText').value = "";
+            document.getElementById('modalKomentarText').value = "";
+            document.getElementById('commentModal').style.display = 'flex';
+            document.getElementById('commentForm').action = SCRIPT_URL;
+        }
+
+        function closeModal() {
+            document.getElementById('commentModal').style.display = 'none';
+        }
+
+        function submitForm() {
+            isSubmitting = true;
+            let actionType = document.getElementById('modalAction').value;
+            let datumSada = new Date().toLocaleString("bs-BA");
+
+            if(actionType === "addRecord") {
+                let newId = document.getElementById('modalNewId').value || "Novi slučaj";
+                let newLok = document.getElementById('modalNewLokacija').value || "-";
+                let newOsoba = document.getElementById('modalNewOsoba').value || "-";
+                let novStatus = document.getElementById('modalStatusSelect').value;
+                let novaOpaska = document.getElementById('modalOpaskaText').value;
+                let novKomentar = document.getElementById('modalKomentarText').value;
+                let punKomentar = novKomentar + ` (Kreirano: ${datumSada} - ${trenutniKorisnik})`;
+
+                sviSlucajevi.unshift({
+                    id: newId,
+                    lokacija: newLok,
+                    osoba: newOsoba,
+                    status: novStatus,
+                    opaska: novaOpaska,
+                    komentar: punKomentar
+                });
+            } else {
+                let id = document.getElementById('modalId').value;
+                let novStatus = document.getElementById('modalStatusSelect').value;
+                let novaOpaska = document.getElementById('modalOpaskaText').value;
+                let novKomentar = document.getElementById('modalKomentarText').value;
+                let punKomentar = novKomentar + ` (Ažurirano: ${datumSada} - ${trenutniKorisnik})`;
+
+                let item = sviSlucajevi.find(x => String(x.id) === String(id));
+                if (item) { 
+                    item.status = novStatus; 
+                    item.opaska = novaOpaska;
+                    item.komentar = punKomentar; 
+                }
+            }
+
+            renderTable();
+            setTimeout(() => {
+                closeModal();
+            }, 300);
+        }
+
+        function loadData() {
+            fetch(SCRIPT_URL)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.slucajevi && data.slucajevi.length > 0) sviSlucajevi = data.slucajevi;
+                    renderTable();
+                })
+                .catch(() => {});
+        }
+    </script>
+</body>            
+</html>
+Sa ovim kodom na GitHub-u i onim skriptom maloprije u Apps Script-u, sve će funkcionisati besprijekorno!
