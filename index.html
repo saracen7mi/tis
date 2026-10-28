@@ -110,10 +110,11 @@
         h2 { color: var(--text-main); margin: 0; font-size: 1.25rem; }
 
         .btn-add {
-            background: var(--success); color: white; border: none; padding: 10px 18px; border-radius: 8px;
+            background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 8px;
             font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.2s ease;
+            box-shadow: 0 4px 12px var(--accent-glow);
         }
-        .btn-add:hover { background: #059669; }
+        .btn-add:hover { background: #2563eb; transform: translateY(-1px); }
 
         .btn-print {
             background: rgba(59, 130, 246, 0.15); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.3);
@@ -139,6 +140,10 @@
         }
         tbody tr:hover { background-color: rgba(255, 255, 255, 0.02); }
 
+        .comment-cell {
+            color: #d1d5db; font-style: italic; background: rgba(11, 15, 25, 0.4); min-width: 220px; line-height: 1.4;
+        }
+
         .section-title { font-size: 1.15rem; color: var(--accent); margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
         .section-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5; }
         .recommendations-box { background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 15px; border-radius: 10px; margin-top: 15px; font-size: 0.88rem; }
@@ -151,6 +156,13 @@
             padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: all 0.2s ease;
         }
         .btn-edit:hover { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
+
+        .tag {
+            padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block;
+        }
+        .tag-sent { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .tag-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .tag-check { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
 
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -217,22 +229,42 @@
                 <button class="btn-logout" onclick="logout()">Odjava 🚪</button>
             </div>
             <h1>🏛️ INO BiH — Terenski Ured Sarajevo</h1>
-            <p>Analiza stanja u kosturnici g.g. Visoko prema reviziji ICMP-a nadležnost OJT I.S.</p>
+            <p>Analiza stanja u kosturnici g.g.Visoko prema reviziji ICMP-a nadleznost OJT I.S.</p>
         </header>
 
         <div class="container">
-            <!-- GLAVNO UPRAVLJANJE I PRETRAGA -->
-            <div class="card" style="padding: 18px 25px; margin-bottom: 20px;">
-                <div class="header-actions" style="border-bottom: none; padding-bottom: 0; margin-bottom: 15px;">
-                    <h2>📋 Upravljanje predmetima i izvještaji</h2>
+            <!-- GLAVNA TABELA IZ APPS SCRIPT (PRVA NA VRHU) -->
+            <div class="card">
+                <div class="header-actions">
+                    <h2>📋 Svi slučajevi (Reasocijacije i Ukopani)</h2>
                     <div class="action-buttons">
                         <button class="btn-print" onclick="generisiPDF()">🖨️ Ispiši u PDF</button>
                         <button class="btn-add" onclick="openAddModal()">➕ Dodaj novi slučaj</button>
                     </div>
                 </div>
-                <input type="text" id="searchBar" class="search-bar" placeholder="🔍 Pretraži po broju slučaja, oznaci, komentarima ili preporukama..." onkeyup="filterTables()" style="margin-bottom:0;">
+
+                <input type="text" id="searchSlucajevi" class="search-bar" placeholder="🔍 Pretraži po broju slučaja, lokaciji, osobi, opasci ili komentarima..." onkeyup="filterSlucajevi()">
+                
+                <div class="table-responsive">
+                    <table id="tblSlucajevi">
+                        <thead>
+                            <tr>
+                                <th style="width: 100px;">Slučaj / ID</th>
+                                <th>Lokacija</th>
+                                <th>Osoba / Identitet</th>
+                                <th>Status Zahtjeva (OJT I.S.)</th>
+                                <th>ICMP Opaska</th>
+                                <th style="width: 250px;">Komentar / Datum izmjene</th>
+                                <th style="width: 90px; text-align: center;">Akcija</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
 
+            <!-- DODATE TABELE NA KRAJU NAKON APPS SCRIPT TABELE -->
+            
             <!-- TABELA 1: MATERIJAL ZA KOSTURNICU -->
             <div class="card">
                 <h3 class="section-title">6. Slučajevi definirani kao materijal za kosturnicu</h3>
@@ -247,7 +279,7 @@
                                 <th style="width: 45px;">Br.</th>
                                 <th style="width: 200px;">Oznaka slučaja</th>
                                 <th>Komentar</th>
-                                <th style="width: 220px;">Preporuka INO (trajni ukop nakon očitovanja Tužilaštva)</th>
+                                <th style="width: 260px;">Preporuka INO (trajni ukop nakon očitovanja Tužilaštva)</th>
                                 <th style="width: 75px; text-align: center;">Akcija</th>
                             </tr>
                         </thead>
@@ -278,7 +310,7 @@
                                 <th style="width: 45px;">Br.</th>
                                 <th style="width: 190px;">Oznaka slučaja</th>
                                 <th style="width: 190px;">DNA uzorci</th>
-                                <th>Preporuka INO (trajni ukop nakon očitovanja Tužilaštva)</th>
+                                <th style="width: 260px;">Preporuka INO (trajni ukop nakon očitovanja Tužilaštva)</th>
                                 <th style="width: 75px; text-align: center;">Akcija</th>
                             </tr>
                         </thead>
@@ -295,6 +327,7 @@
                     </ul>
                 </div>
             </div>
+
         </div>
 
         <footer>
@@ -302,7 +335,7 @@
         </footer>
     </div>
 
-    <!-- MODAL ZA UREĐIVANJE I DODAVANJE -->
+    <!-- MODAL ZA IZMJENU I DODAVANJE -->
     <div id="commentModal" class="modal">
         <div class="modal-content">
             <h3 style="margin-top:0; color: var(--text-main);" id="modalPredmetTitle">Ažuriraj predmet</h3>
@@ -312,19 +345,38 @@
                 <input type="hidden" name="autor" id="modalAutor">
                 
                 <div id="newRecordFields" style="display: none;">
-                    <label style="font-size:0.85rem; color:var(--text-muted);">Redni broj (Br.):</label>
-                    <input type="text" name="br" id="modalBr" placeholder="npr. 66">
+                    <label style="font-size:0.85rem; color:var(--text-muted);">Slučaj / ID (Npr. Slučaj br. 7 ili Predmet #43):</label>
+                    <input type="text" name="newId" id="modalNewId" placeholder="Oznaka...">
                     
-                    <label style="font-size:0.85rem; color:var(--text-muted);">Oznaka slučaja:</label>
-                    <input type="text" name="oznaka" id="modalOznaka" placeholder="Naziv lokacije / predmeta...">
+                    <label style="font-size:0.85rem; color:var(--text-muted);">Lokacija:</label>
+                    <input type="text" name="newLokacija" id="modalNewLokacija" placeholder="Naziv lokacije...">
+
+                    <label style="font-size:0.85rem; color:var(--text-muted);">Osoba / Identitet:</label>
+                    <input type="text" name="newOsoba" id="modalNewOsoba" placeholder="Ime i prezime...">
                 </div>
+
+                <div id="statusGroup">
+                    <label style="font-size:0.85rem; color:var(--text-muted);">Status predmeta:</label>
+                    <select name="status" id="modalStatusSelect">
+                        <option value="Poslato OJT I.S. (2025)">Poslato OJT I.S. (2025)</option>
+                        <option value="Potrebna reasocijacija">Potrebna reasocijacija</option>
+                        <option value="Čeka kontakte">Čeka kontakte</option>
+                        <option value="Ukopan">Ukopan</option>
+                        <option value="Identifikovan">Identifikovan</option>
+                        <option value="U toku / Provjera">U toku / Provjera</option>
+                        <option value="Odbijeno od porodice">Odbijeno od porodice</option>
+                    </select>
+                </div>
+
+                <label style="font-size:0.85rem; color:var(--text-muted);" id="labelOpaska">ICMP Opaska / Stanje skeleta:</label>
+                <input type="text" name="opaska" id="modalOpaskaText" placeholder="Unesite opasku...">
 
                 <div id="fieldPrviDio">
                     <label style="font-size:0.85rem; color:var(--text-muted);" id="labelPrviDio">Komentar / Napomena:</label>
                     <textarea name="komentar" id="modalKomentarText" rows="3" placeholder="Upišite detalje..."></textarea>
                 </div>
 
-                <div>
+                <div id="preporukaGroup">
                     <label style="font-size:0.85rem; color:var(--text-muted);">Preporuka INO (trajni ukop nakon očitovanja Tužilaštva):</label>
                     <textarea name="preporukaIno" id="modalPreporukaInoText" rows="3" placeholder="Unesite preporuku za trajni ukop..."></textarea>
                 </div>
@@ -341,96 +393,99 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyP9jaf8kULPUtZfhpW8bZ3MjyYY18XtyWtI5yD9i9OF0KexmUiEJq4UZnHVAezzVI/exec";
         let isSubmitting = false;
         let trenutniKorisnik = "";
-        let aktivnaTabela = "kosturnica";
+        let sviSlucajevi = [];
+        let aktivnaTabela = "appMain";
+
+        const DEFAULT_PREPORUKA = "trajni ukop nakon očitovanja Tužilaštva";
 
         // TABELA 1: Materijal za kosturnicu (65 predmeta)
         let podaciKosturnica = [
-            {br: "1", oznaka: "Bećari - Sokolac Miješane kosti", komentar: "DNK uzorak KTE-19/09-1-RP reasociran sa KTE-19/09-7-I-TV & KTE-19/09-7-G-FB (slučaj Bećari-Sokolac Br. 7) na osnovu podudaranja profila DNK. Slučaj sadrži samo prethodno uzorkovane skeletne elemente...", preporukaIno: ""},
-            {br: "2", oznaka: "Bećari-Sokolac Br. 6", komentar: "Svi prethodno uzeti uzorci za DNK analizu nisu uspjeli generirati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "3", oznaka: "Bećari-Sokolac NN-4, 7, 11", komentar: "DNK uzorak KTE-20/09-13-FB reasociran sa KTE-19/09-9-LCL & KTE-19/09-9-LP (slučaj Bećari-Sokolac Br. 9) na osnovu podudaranja profila DNK...", preporukaIno: ""},
-            {br: "4", oznaka: "BEZ BROJA (KTE 21/10 \"PERUČAC\" - KOSTURNICA, VREĆA BR.1)", komentar: "Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK i označen je kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "5", oznaka: "Donje Štitarevo 260", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "6", oznaka: "Donje Štitarevo 264", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "7", oznaka: "Donje Štitarevo 275", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "8", oznaka: "Donje Štitarevo 276", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "9", oznaka: "Donje Štitarevo 305", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "10", oznaka: "Donje Štitarevo 306", komentar: "Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "11", oznaka: "Donje Štitarevo 308", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "12", oznaka: "Donje Štitarevo 326 (4B)", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "13", oznaka: "Donje Štitarevo V-A 194", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "14", oznaka: "Đurevića Polje 209", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "15", oznaka: "Đurevića Polje 212", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "16", oznaka: "Đurevića Polje 213", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "17", oznaka: "Đurevića Polje 360", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "18", oznaka: "Đurevića Polje Br.358", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "19", oznaka: "Đurevića Polje IX 162", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "20", oznaka: "Đurevića Polje VIII Br. 205 M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "21", oznaka: "Đurevića Polje-Višegrad 168", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "22", oznaka: "Đurevića Polje IX Br.163", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "23", oznaka: "Hrtar Grad 140", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "24", oznaka: "Hrtar Grad 141", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "25", oznaka: "Kurtalići 229", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "26", oznaka: "Kurtalići 235", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "27", oznaka: "Kurtalići 236", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "28", oznaka: "Kurtalići 237", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "29", oznaka: "Kurtalići 243", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "30", oznaka: "Kurtalići 248", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "31", oznaka: "Lugova Ravan Br. 320", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "32", oznaka: "Miloševići 221", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "33", oznaka: "Miloševići 224", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "34", oznaka: "Miloševići 225 M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "35", oznaka: "Miloševići, Višegrad 56", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "36", oznaka: "Nikolići - 3 178", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "37", oznaka: "Nikolići 338", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "38", oznaka: "Nikolići III B 296", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "39", oznaka: "Nikolići, Višegrad IV 60", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "40", oznaka: "Nikolići-4 170", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "41", oznaka: "Nikolići (2A) 182", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "42", oznaka: "Nikolići-3 179", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "43", oznaka: "Paočići 286", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "44", oznaka: "Paočići 292", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "45", oznaka: "Paočići Br. 191", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "46", oznaka: "Paočići Br. 193", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "47", oznaka: "Skela IA 203", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "48", oznaka: "Skela-1-B 278-M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "49", oznaka: "Slap 317", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "50", oznaka: "Stari Brod - Rogatica - Sektor A 90", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "51", oznaka: "Stari Brod - Rogatica 84 sektor B", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "52", oznaka: "Stari Brod 101", komentar: "Ovaj slučaj nije prethodno uzorkovan za analizu DNK i nema skeletnog materijala pogodnog za analizu DNK budući da slučaj sadrži jedan sacrum (krsna kost).", preporukaIno: ""},
-            {br: "53", oznaka: "Stari Brod 106", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "54", oznaka: "Stari Brod 107", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "55", oznaka: "Stari Brod 108", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "56", oznaka: "Stari Brod 110", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "57", oznaka: "Stari Brod 126", komentar: "Ovaj slučaj nije prethodno uzorkovan za analizu DNK i nema skeletnog materijala pogodnog za analizu DNK budući da slučaj sadrži jednu lijevu metatarzalnu kost #1.", preporukaIno: ""},
-            {br: "58", oznaka: "Stari Brod 346", komentar: "Ovaj slučaj nije prethodno uzorkovan za analizu DNK i nema skeletnog materijala pogodnog za analizu DNK budući da slučaj sadrži jedan sacrum (krsna kost).", preporukaIno: ""},
-            {br: "59", oznaka: "Stari Brod 77", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "60", oznaka: "Stari Brod 97", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "61", oznaka: "Stari Brod Sektor A BR. 80", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "62", oznaka: "Stari Brod, Rogatica 83", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "63", oznaka: "STARI BROD SEKTOR C Br.363", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "64", oznaka: "Vidojeva Stijenčica br.3", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK te je označen kao materijal za kosturnicu.", preporukaIno: ""},
-            {br: "65", oznaka: "Stečci 169", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK. Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka za DNK analizu.", preporukaIno: ""}
+            {br: "1", oznaka: "Bećari - Sokolac Miješane kosti", komentar: "DNK uzorak KTE-19/09-1-RP reasociran sa KTE-19/09-7-I-TV & KTE-19/09-7-G-FB...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "2", oznaka: "Bećari-Sokolac Br. 6", komentar: "Svi prethodno uzeti uzorci za DNK analizu nisu uspjeli generirati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "3", oznaka: "Bećari-Sokolac NN-4, 7, 11", komentar: "DNK uzorak KTE-20/09-13-FB reasociran...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "4", oznaka: "BEZ BROJA (KTE 21/10 \"PERUČAC\" - KOSTURNICA, VREĆA BR.1)", komentar: "Slučaj ne sadrži skeletni materijal pogodan za uzorkovanje DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "5", oznaka: "Donje Štitarevo 260", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "6", oznaka: "Donje Štitarevo 264", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "7", oznaka: "Donje Štitarevo 275", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "8", oznaka: "Donje Štitarevo 276", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "9", oznaka: "Donje Štitarevo 305", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "10", oznaka: "Donje Štitarevo 306", komentar: "Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "11", oznaka: "Donje Štitarevo 308", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "12", oznaka: "Donje Štitarevo 326 (4B)", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "13", oznaka: "Donje Štitarevo V-A 194", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "14", oznaka: "Đurevića Polje 209", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "15", oznaka: "Đurevića Polje 212", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "16", oznaka: "Đurevića Polje 213", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "17", oznaka: "Đurevića Polje 360", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "18", oznaka: "Đurevića Polje Br.358", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "19", oznaka: "Đurevića Polje IX 162", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "20", oznaka: "Đurevića Polje VIII Br. 205 M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "21", oznaka: "Đurevića Polje-Višegrad 168", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "22", oznaka: "Đurevića Polje IX Br.163", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "23", oznaka: "Hrtar Grad 140", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "24", oznaka: "Hrtar Grad 141", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "25", oznaka: "Kurtalići 229", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "26", oznaka: "Kurtalići 235", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "27", oznaka: "Kurtalići 236", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "28", oznaka: "Kurtalići 237", komentar: "Prethodno uzeti uzorak za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "29", oznaka: "Kurtalići 243", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "30", oznaka: "Kurtalići 248", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "31", oznaka: "Lugova Ravan Br. 320", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "32", oznaka: "Miloševići 221", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "33", oznaka: "Miloševići 224", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "34", oznaka: "Miloševići 225 M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "35", oznaka: "Miloševići, Višegrad 56", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "36", oznaka: "Nikolići - 3 178", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "37", oznaka: "Nikolići 338", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "38", oznaka: "Nikolići III B 296", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "39", oznaka: "Nikolići, Višegrad IV 60", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "40", oznaka: "Nikolići-4 170", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "41", oznaka: "Nikolići (2A) 182", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "42", oznaka: "Nikolići-3 179", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "43", oznaka: "Paočići 286", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "44", oznaka: "Paočići 292", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "45", oznaka: "Paočići Br. 191", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "46", oznaka: "Paočići Br. 193", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "47", oznaka: "Skela IA 203", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "48", oznaka: "Skela-1-B 278-M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "49", oznaka: "Slap 317", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "50", oznaka: "Stari Brod - Rogatica - Sektor A 90", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "51", oznaka: "Stari Brod - Rogatica 84 sektor B", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "52", oznaka: "Stari Brod 101", komentar: "Ovaj slučaj nije prethodno uzorkovan za analizu DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "53", oznaka: "Stari Brod 106", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "54", oznaka: "Stari Brod 107", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "55", oznaka: "Stari Brod 108", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "56", oznaka: "Stari Brod 110", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "57", oznaka: "Stari Brod 126", komentar: "Ovaj slučaj nije prethodno uzorkovan za analizu DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "58", oznaka: "Stari Brod 346", komentar: "Ovaj slučaj nije prethodno uzorkovan za analizu DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "59", oznaka: "Stari Brod 77", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "60", oznaka: "Stari Brod 97", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "61", oznaka: "Stari Brod Sektor A BR. 80", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "62", oznaka: "Stari Brod, Rogatica 83", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "63", oznaka: "STARI BROD SEKTOR C Br.363", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "64", oznaka: "Vidojeva Stijenčica br.3", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "65", oznaka: "Stečci 169", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA}
         ];
 
         // TABELA 2: Slučajevi bez podudaranja profila (17 predmeta)
         let podaciBezPodudaranja = [
-            {br: "1", oznaka: "Đurevića Polje III Br.166", uzorci: "KTE-21-10-166-RT<br>KTE-21-10-205-LMT", preporukaIno: ""},
-            {br: "2", oznaka: "Mušićka Stijena 219", uzorci: "KTE-21-10-219-LT-2", preporukaIno: ""},
-            {br: "3", oznaka: "STARI BROD SEKTOR B Br.93", uzorci: "KTE-21-10-93-RT2", preporukaIno: ""},
-            {br: "4", oznaka: "Đurevića Polje 73", uzorci: "KTE-21-10-356-RPT<br>KTE-21-10-73-PPT", preporukaIno: ""},
-            {br: "5", oznaka: "Bajina Bašta ROG.01-STB.001B", uzorci: "KTE-21-10-93-MNT", preporukaIno: ""},
-            {br: "6", oznaka: "Hrtar Grad Br.135", uzorci: "KTE-21-10-135-LU2", preporukaIno: ""},
-            {br: "7", oznaka: "ĐUREVIĆI - ĐUREVIĆA POLJE X Br.151", uzorci: "KTE-21-10-151-LF<br>KTE-21-10-151-LRB", preporukaIno: ""},
-            {br: "8", oznaka: "ĐUREVIĆI - ĐUREVIĆA POLJE Br.155", uzorci: "KTE-21-10-152-LU<br>KTE-21-10-155-LF", preporukaIno: ""},
-            {br: "9", oznaka: "Resnik I, Višegrad - Br. 59", uzorci: "KTE-21-10-59-LT", preporukaIno: ""},
-            {br: "10", oznaka: "Donje Štitarevo 198", uzorci: "KTE-21-10-198-LF<br>KTE-21-10-198-RPT", preporukaIno: ""},
-            {br: "11", oznaka: "Gornje Štitarevo 324", uzorci: "KTE-21-10-324-RT<br>KTE-21-10-324-RF", preporukaIno: ""},
-            {br: "12", oznaka: "Donje Štitarevo 329", uzorci: "KTE-21-10-329-LF", preporukaIno: ""},
-            {br: "13", oznaka: "Nikolići 293", uzorci: "KTE-21-10-293-T", preporukaIno: ""},
-            {br: "14", oznaka: "Đurevići, Đurevića Potok 160", uzorci: "KTE-21-10-160-RT", preporukaIno: ""},
-            {br: "15", oznaka: "Stari Brod 355", uzorci: "KTE-21-10-354-LH<br>KTE-21-10-354-LR", preporukaIno: ""},
-            {br: "16", oznaka: "TATINICA 332", uzorci: "KTE-21-10-332-LF", preporukaIno: ""},
-            {br: "17", oznaka: "Đurevića Polje IV br.67", uzorci: "KTE-21-10-67-LF<br>KTE-21-10-67-LH", preporukaIno: ""}
+            {br: "1", oznaka: "Đurevića Polje III Br.166", uzorci: "KTE-21-10-166-RT<br>KTE-21-10-205-LMT", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "2", oznaka: "Mušićka Stijena 219", uzorci: "KTE-21-10-219-LT-2", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "3", oznaka: "STARI BROD SEKTOR B Br.93", uzorci: "KTE-21-10-93-RT2", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "4", oznaka: "Đurevića Polje 73", uzorci: "KTE-21-10-356-RPT<br>KTE-21-10-73-PPT", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "5", oznaka: "Bajina Bašta ROG.01-STB.001B", uzorci: "KTE-21-10-93-MNT", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "6", oznaka: "Hrtar Grad Br.135", uzorci: "KTE-21-10-135-LU2", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "7", oznaka: "ĐUREVIĆI - ĐUREVIĆA POLJE X Br.151", uzorci: "KTE-21-10-151-LF<br>KTE-21-10-151-LRB", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "8", oznaka: "ĐUREVIĆI - ĐUREVIĆA POLJE Br.155", uzorci: "KTE-21-10-152-LU<br>KTE-21-10-155-LF", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "9", oznaka: "Resnik I, Višegrad - Br. 59", uzorci: "KTE-21-10-59-LT", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "10", oznaka: "Donje Štitarevo 198", uzorci: "KTE-21-10-198-LF<br>KTE-21-10-198-RPT", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "11", oznaka: "Gornje Štitarevo 324", uzorci: "KTE-21-10-324-RT<br>KTE-21-10-324-RF", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "12", oznaka: "Donje Štitarevo 329", uzorci: "KTE-21-10-329-LF", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "13", oznaka: "Nikolići 293", uzorci: "KTE-21-10-293-T", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "14", oznaka: "Đurevići, Đurevića Potok 160", uzorci: "KTE-21-10-160-RT", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "15", oznaka: "Stari Brod 355", uzorci: "KTE-21-10-354-LH<br>KTE-21-10-354-LR", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "16", oznaka: "TATINICA 332", uzorci: "KTE-21-10-332-LF", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "17", oznaka: "Đurevića Polje IV br.67", uzorci: "KTE-21-10-67-LF<br>KTE-21-10-67-LH", preporukaIno: DEFAULT_PREPORUKA}
         ];
 
         function handleLogin(e) {
@@ -458,7 +513,8 @@
                 document.getElementById('prijavljeniKorisnik').innerText = fullname;
                 document.getElementById('loginScreen').style.display = "none";
                 document.getElementById('mainApp').style.display = "block";
-                renderTables();
+                loadData();
+                renderStaticTables();
                 btn.innerText = "Prijavi se 🔒";
                 btn.disabled = false;
             }, 400);
@@ -472,65 +528,102 @@
             document.getElementById('loginPass').value = "";
         }
 
-        function renderTables() {
-            renderKosturnica(podaciKosturnica);
-            renderBezPodudaranja(podaciBezPodudaranja);
-        }
-
-        function renderKosturnica(dataList) {
-            let tbody = document.querySelector('#tblKosturnica tbody');
+        function renderTable() {
+            let tbody = document.querySelector('#tblSlucajevi tbody');
             tbody.innerHTML = '';
-            dataList.forEach(item => {
+            sviSlucajevi.forEach(item => {
                 let row = tbody.insertRow();
+                let isSent = item.status && item.status.includes("2025");
+                let tagClass = isSent ? "tag-sent" : ((item.status && item.status.includes("Odbijeno")) ? "tag-check" : "tag-pending");
+
                 row.innerHTML = `
-                    <td><strong>${item.br}</strong></td>
-                    <td>${item.oznaka}</td>
-                    <td style="color:#d1d5db; font-style:italic;">${item.komentar || '-'}</td>
-                    <td style="color:#93c5fd; font-weight:500;">${item.preporukaIno || '-'}</td>
-                    <td style="text-align: center;"><button class="btn-edit" onclick="openEditModal('kosturnica', '${item.br}')">✏️ Uredi</button></td>
+                    <td><strong>${item.id}</strong></td>
+                    <td>${item.lokacija}</td>
+                    <td>${item.osoba}</td>
+                    <td><span class="tag ${tagClass}">${item.status}</span></td>
+                    <td><small style="color:var(--text-muted);">${item.opaska || '-'}</small></td>
+                    <td class="comment-cell">${item.komentar || '<span style="color:var(--text-muted); font-size:0.8rem;">— nema komentara —</span>'}</td>
+                    <td style="text-align: center;"><button class="btn-edit" onclick="openModal('${item.id}', '${item.status}', '${item.opaska || ''}', '${item.komentar || ''}')">✏️ Uredi</button></td>
                 `;
             });
         }
 
-        function renderBezPodudaranja(dataList) {
-            let tbody = document.querySelector('#tblBezPodudaranja tbody');
-            tbody.innerHTML = '';
-            dataList.forEach(item => {
-                let row = tbody.insertRow();
+        function renderStaticTables() {
+            let tbodyK = document.querySelector('#tblKosturnica tbody');
+            tbodyK.innerHTML = '';
+            podaciKosturnica.forEach(item => {
+                let row = tbodyK.insertRow();
+                row.innerHTML = `
+                    <td><strong>${item.br}</strong></td>
+                    <td>${item.oznaka}</td>
+                    <td style="color:#d1d5db; font-style:italic;">${item.komentar || '-'}</td>
+                    <td style="color:#93c5fd; font-weight:500;">${item.preporukaIno || DEFAULT_PREPORUKA}</td>
+                    <td style="text-align: center;"><button class="btn-edit" onclick="openEditModal('kosturnica', '${item.br}')">✏️ Uredi</button></td>
+                `;
+            });
+
+            let tbodyB = document.querySelector('#tblBezPodudaranja tbody');
+            tbodyB.innerHTML = '';
+            podaciBezPodudaranja.forEach(item => {
+                let row = tbodyB.insertRow();
                 row.innerHTML = `
                     <td><strong>${item.br}</strong></td>
                     <td>${item.oznaka}</td>
                     <td><code>${item.uzorci || '-'}</code></td>
-                    <td style="color:#93c5fd; font-weight:500;">${item.preporukaIno || '-'}</td>
+                    <td style="color:#93c5fd; font-weight:500;">${item.preporukaIno || DEFAULT_PREPORUKA}</td>
                     <td style="text-align: center;"><button class="btn-edit" onclick="openEditModal('bezPodudaranja', '${item.br}')">✏️ Uredi</button></td>
                 `;
             });
         }
 
-        function filterTables() {
-            let search = document.getElementById('searchBar').value.toLowerCase();
-            
-            let filteredK = podaciKosturnica.filter(item => 
-                String(item.br).toLowerCase().includes(search) ||
-                item.oznaka.toLowerCase().includes(search) ||
-                item.komentar.toLowerCase().includes(search) ||
-                (item.preporukaIno && item.preporukaIno.toLowerCase().includes(search))
-            );
-            renderKosturnica(filteredK);
-
-            let filteredB = podaciBezPodudaranja.filter(item => 
-                String(item.br).toLowerCase().includes(search) ||
-                item.oznaka.toLowerCase().includes(search) ||
-                String(item.uzorci).toLowerCase().includes(search) ||
-                (item.preporukaIno && item.preporukaIno.toLowerCase().includes(search))
-            );
-            renderBezPodudaranja(filteredB);
+        function filterSlucajevi() {
+            let input = document.getElementById('searchSlucajevi').value.toLowerCase();
+            let rows = document.querySelectorAll('#tblSlucajevi tbody tr');
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
         }
 
-        function generisiPDF() {
-            let imeKorisnika = trenutniKorisnik || "Mirza Saračević";
-            fetch(`${SCRIPT_URL}?action=logPrint&autor=${encodeURIComponent(imeKorisnika)}`).catch(() => {});
-            window.print();
+        function openModal(id, trenStatus, trenOpaska, postojeciKomentar) {
+            aktivnaTabela = "appMain";
+            document.getElementById('modalAction').value = "updateRecord";
+            document.getElementById('modalAutor').value = trenutniKorisnik;
+            document.getElementById('newRecordFields').style.display = "none";
+            document.getElementById('statusGroup').style.display = "block";
+            document.getElementById('labelOpaska').style.display = "block";
+            document.getElementById('modalOpaskaText').style.display = "block";
+            document.getElementById('preporukaGroup').style.display = "none";
+            document.getElementById('labelPrviDio').innerText = "Komentar / Napomena:";
+            
+            document.getElementById('modalId').value = id;
+            document.getElementById('modalPredmetTitle').innerText = `Ažuriraj predmet (${id})`;
+            document.getElementById('modalStatusSelect').value = trenStatus;
+            document.getElementById('modalOpaskaText').value = trenOpaska;
+            document.getElementById('modalKomentarText').value = postojeciKomentar;
+            document.getElementById('commentModal').style.display = 'flex';
+            document.getElementById('commentForm').action = SCRIPT_URL;
+        }
+
+        function openAddModal() {
+            aktivnaTabela = "appMain";
+            document.getElementById('modalAction').value = "addRecord";
+            document.getElementById('modalAutor').value = trenutniKorisnik;
+            document.getElementById('newRecordFields').style.display = "block";
+            document.getElementById('statusGroup').style.display = "block";
+            document.getElementById('labelOpaska').style.display = "block";
+            document.getElementById('modalOpaskaText').style.display = "block";
+            document.getElementById('preporukaGroup').style.display = "none";
+            document.getElementById('labelPrviDio').innerText = "Komentar / Napomena:";
+
+            document.getElementById('modalPredmetTitle').innerText = "➕ Unesi novi slučaj";
+            document.getElementById('modalNewId').value = "Predmet #" + (sviSlucajevi.length + 1);
+            document.getElementById('modalNewLokacija').value = "";
+            document.getElementById('modalNewOsoba').value = "";
+            document.getElementById('modalOpaskaText').value = "";
+            document.getElementById('modalKomentarText').value = "";
+            document.getElementById('commentModal').style.display = 'flex';
+            document.getElementById('commentForm').action = SCRIPT_URL;
         }
 
         function openEditModal(tip, br) {
@@ -540,9 +633,13 @@
 
             document.getElementById('modalAction').value = "updateRecord";
             document.getElementById('newRecordFields').style.display = "none";
+            document.getElementById('statusGroup').style.display = "none";
+            document.getElementById('labelOpaska').style.display = "none";
+            document.getElementById('modalOpaskaText').style.display = "none";
+            document.getElementById('preporukaGroup').style.display = "block";
             document.getElementById('modalId').value = item.br;
             document.getElementById('modalAutor').value = trenutniKorisnik;
-            document.getElementById('modalPredmetTitle').innerText = `Ažuriraj predmet (Br. ${item.br})`;
+            document.getElementById('modalPredmetTitle').innerText = `Uredi predmet (Br. ${item.br})`;
             
             if (tip === 'kosturnica') {
                 document.getElementById('labelPrviDio').innerText = "Komentar / Napomena:";
@@ -552,22 +649,7 @@
                 document.getElementById('modalKomentarText').value = (item.uzorci || "").replace(/<br>/g, '\n');
             }
 
-            document.getElementById('modalPreporukaInoText').value = item.preporukaIno || "";
-            document.getElementById('commentModal').style.display = 'flex';
-        }
-
-        function openAddModal() {
-            aktivnaTabela = "kosturnica";
-            document.getElementById('modalAction').value = "addRecord";
-            document.getElementById('modalAutor').value = trenutniKorisnik;
-            document.getElementById('newRecordFields').style.display = "block";
-            document.getElementById('modalPredmetTitle').innerText = "➕ Unesi novi slučaj";
-            document.getElementById('modalBr').value = podaciKosturnica.length + 1;
-            document.getElementById('modalOznaka').value = "";
-            document.getElementById('labelPrviDio').innerText = "Komentar / Napomena:";
-            document.getElementById('modalKomentarText').value = "";
-            document.getElementById('modalPreporukaInoText').value = "";
-
+            document.getElementById('modalPreporukaInoText').value = item.preporukaIno || DEFAULT_PREPORUKA;
             document.getElementById('commentModal').style.display = 'flex';
         }
 
@@ -582,17 +664,37 @@
             let unosPrvi = document.getElementById('modalKomentarText').value;
             let unosPreporuka = document.getElementById('modalPreporukaInoText').value;
 
-            if (actionType === "addRecord") {
-                let novBr = document.getElementById('modalBr').value || (podaciKosturnica.length + 1);
-                let novaOznaka = document.getElementById('modalOznaka').value || "Novi slučaj";
-                let novKom = unosPrvi + ` (Kreirao: ${datumSada} - ${trenutniKorisnik})`;
+            if (aktivnaTabela === "appMain") {
+                if(actionType === "addRecord") {
+                    let newId = document.getElementById('modalNewId').value || "Novi slučaj";
+                    let newLok = document.getElementById('modalNewLokacija').value || "-";
+                    let newOsoba = document.getElementById('modalNewOsoba').value || "-";
+                    let novStatus = document.getElementById('modalStatusSelect').value;
+                    let novaOpaska = document.getElementById('modalOpaskaText').value;
+                    let punKomentar = unosPrvi + ` (Kreirano: ${datumSada} - ${trenutniKorisnik})`;
 
-                podaciKosturnica.push({
-                    br: String(novBr),
-                    oznaka: novaOznaka,
-                    komentar: novKom,
-                    preporukaIno: unosPreporuka
-                });
+                    sviSlucajevi.unshift({
+                        id: newId,
+                        lokacija: newLok,
+                        osoba: newOsoba,
+                        status: novStatus,
+                        opaska: novaOpaska,
+                        komentar: punKomentar
+                    });
+                } else {
+                    let id = document.getElementById('modalId').value;
+                    let novStatus = document.getElementById('modalStatusSelect').value;
+                    let novaOpaska = document.getElementById('modalOpaskaText').value;
+                    let punKomentar = unosPrvi + ` (Ažurirano: ${datumSada} - ${trenutniKorisnik})`;
+
+                    let item = sviSlucajevi.find(x => String(x.id) === String(id));
+                    if (item) { 
+                        item.status = novStatus; 
+                        item.opaska = novaOpaska;
+                        item.komentar = punKomentar; 
+                    }
+                }
+                renderTable();
             } else {
                 let id = document.getElementById('modalId').value;
                 if (aktivnaTabela === 'kosturnica') {
@@ -608,17 +710,24 @@
                         item.preporukaIno = unosPreporuka;
                     }
                 }
+                renderStaticTables();
             }
 
-            renderTables();
             setTimeout(() => { closeModal(); }, 300);
+        }
+
+        function generisiPDF() {
+            let imeKorisnika = trenutniKorisnik || "Mirza Saračević";
+            fetch(`${SCRIPT_URL}?action=logPrint&autor=${encodeURIComponent(imeKorisnika)}`).catch(() => {});
+            window.print();
         }
 
         function loadData() {
             fetch(SCRIPT_URL)
                 .then(res => res.json())
                 .then(data => {
-                    renderTables();
+                    if (data.slucajevi && data.slucajevi.length > 0) sviSlucajevi = data.slucajevi;
+                    renderTable();
                 })
                 .catch(() => {});
         }
