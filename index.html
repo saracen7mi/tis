@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INO BiH | Analiza Stanja u Kosturnicama 2026.</title>
+    <title>INO BiH | Analiza Stanja u Kosturnicama 2026. - OJT Istočno Sarajevo</title>
 
     <!-- META TAGOVI ZA VIBER PREGLED SA GRBOM BiH -->
-    <meta property="og:title" content="INO BiH — Analiza Stanja u Kosturnicama">
+    <meta property="og:title" content="INO BiH — Analiza Stanja u Kosturnicama (OJT Istočno Sarajevo)">
     <meta property="og:description" content="Sistem za evidenciju, analizu i praćenje statusa slučajeva i reasocijacija">
     <meta property="og:image" content="https://i.ibb.co/mdFSZbZ/Screenshot-2026-09-21-at-12-35-16.png">
     <meta property="og:image:type" content="image/png">
@@ -117,10 +117,16 @@
         .btn-add:hover { background: #2563eb; transform: translateY(-1px); }
 
         .btn-print {
+            background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.2s ease;
+        }
+        .btn-print:hover { background: var(--success); color: white; }
+
+        .btn-log {
             background: rgba(59, 130, 246, 0.15); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.3);
             padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.2s ease;
         }
-        .btn-print:hover { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
+        .btn-log:hover { background: var(--accent); color: white; box-shadow: 0 4px 12px var(--accent-glow); }
 
         .search-bar {
             width: 100%; padding: 14px 18px; margin-bottom: 20px; background: #0b0f19; border: 1px solid var(--border);
@@ -181,18 +187,122 @@
 
         .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px; }
 
+        .log-list {
+            max-height: 260px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px;
+            padding: 10px; background: #0b0f19; font-size: 0.85rem; margin-bottom: 15px;
+        }
+        .log-item { padding: 8px; border-bottom: 1px solid var(--border); color: var(--text-main); }
+        .log-item:last-child { border-bottom: none; }
+
         footer { text-align: center; padding: 30px; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
 
-        /* STILOVI ZA ŠTAMPANJE / PDF */
+        /* ELEMENTI VIDLJIVI SAMO PRILIKOM ŠTAMPE */
+        .print-only { display: none; }
+
+        /* STILOVI ZA ŠTAMPANJE / PDF (SLUŽBENI FORMAT) */
         @media print {
-            body { background-color: white !important; color: black !important; }
-            header, .header-actions, .btn-edit, .user-bar, footer, .modal, .search-bar { display: none !important; }
-            .card { border: none !important; box-shadow: none !important; background: white !important; padding: 0 !important; margin-bottom: 25px !important; }
-            .table-responsive { max-height: none !important; overflow: visible !important; border: none !important; }
-            table { font-size: 8pt !important; color: black !important; border: 1px solid #ccc !important; }
-            th { background-color: #f3f4f6 !important; color: black !important; border-bottom: 2px solid #ccc !important; }
-            td { border-bottom: 1px solid #e5e7eb !important; color: black !important; }
-            .section-desc, .recommendations-box { color: black !important; background: none !important; border: none !important; padding: 0 !important; }
+            @page {
+                size: A4 landscape;
+                margin: 14mm 12mm;
+            }
+            body { 
+                background-color: #ffffff !important; 
+                color: #000000 !important; 
+                font-family: "Times New Roman", Times, serif !important;
+            }
+            header, .header-actions, .btn-edit, .user-bar, footer, .modal, .search-bar, .no-print, .screen-only,
+            #tblSlucajevi th.screen-only, #tblSlucajevi td.screen-only { 
+                display: none !important; 
+            }
+            .print-only {
+                display: block !important;
+            }
+            span.print-only {
+                display: inline !important;
+            }
+            .container { 
+                max-width: 100% !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+            }
+            .card { 
+                border: none !important; 
+                box-shadow: none !important; 
+                background: #ffffff !important; 
+                padding: 0 !important; 
+                margin: 0 !important; 
+            }
+            .print-header-title {
+                text-align: center;
+                font-size: 13pt;
+                font-weight: bold;
+                text-transform: uppercase;
+                line-height: 1.35;
+                margin: 0 auto 16px auto;
+                max-width: 90%;
+                color: #000000 !important;
+            }
+            .table-responsive { 
+                max-height: none !important; 
+                overflow: visible !important; 
+                border: none !important; 
+            }
+            table#tblSlucajevi { 
+                width: 100% !important; 
+                font-size: 10pt !important; 
+                color: #000000 !important; 
+                border-collapse: collapse !important; 
+                table-layout: fixed;
+            }
+            #tblSlucajevi thead {
+                display: table-header-group;
+            }
+            #tblSlucajevi tr {
+                page-break-inside: avoid;
+            }
+            #tblSlucajevi th, #tblSlucajevi td { 
+                border: 1px solid #000000 !important; 
+                padding: 6px 8px !important; 
+                color: #000000 !important; 
+                background: #ffffff !important;
+                vertical-align: top !important;
+                text-align: left !important;
+                font-style: normal !important;
+                position: static !important;
+                word-wrap: break-word;
+            }
+            #tblSlucajevi th { 
+                background-color: #f2f2f2 !important; 
+                font-weight: bold !important; 
+                text-transform: none !important;
+                font-size: 10pt !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            #tblSlucajevi th.col-print-br, #tblSlucajevi td.col-print-br { width: 8% !important; }
+            #tblSlucajevi th.col-print-oznaka, #tblSlucajevi td.col-print-oznaka { width: 24% !important; }
+            #tblSlucajevi th.col-print-analiza, #tblSlucajevi td.col-print-analiza { width: 46% !important; }
+            #tblSlucajevi th.col-print-preporuka, #tblSlucajevi td.col-print-preporuka { width: 22% !important; text-align: left !important; }
+
+            #tblSlucajevi .tag {
+                background: transparent !important;
+                border: none !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                font-weight: normal !important;
+                font-size: 10pt !important;
+                border-radius: 0 !important;
+            }
+
+            .print-footer-meta {
+                margin-top: 18px;
+                padding-top: 8px;
+                border-top: 1px solid #000000;
+                display: flex !important;
+                justify-content: space-between;
+                font-size: 9.5pt;
+                color: #000000 !important;
+            }
         }
     </style>
 </head>
@@ -235,9 +345,15 @@
         <div class="container">
             <!-- GLAVNA TABELA IZ APPS SCRIPT (PRVA NA VRHU) -->
             <div class="card">
+                <!-- ZVANIČNI NASLOV SAMO ZA ŠTAMPU -->
+                <div class="print-only print-header-title">
+                    Analiza stanja u kosturnici g.g. Visoko prema reviziji ICMP-a — nadležnost OJT Istočno Sarajevo
+                </div>
+
                 <div class="header-actions">
                     <h2>📋 Svi slučajevi (Reasocijacije i Ukopani)</h2>
                     <div class="action-buttons">
+                        <button class="btn-log" onclick="openPrintLogModal()">📜 Pregled štampe</button>
                         <button class="btn-print" onclick="generisiPDF()">🖨️ Ispiši u PDF</button>
                         <button class="btn-add" onclick="openAddModal()">➕ Dodaj novi slučaj</button>
                     </div>
@@ -249,24 +365,39 @@
                     <table id="tblSlucajevi">
                         <thead>
                             <tr>
-                                <th style="width: 100px;">Slučaj / ID</th>
-                                <th>Lokacija</th>
-                                <th>Osoba / Identitet</th>
-                                <th>Status Zahtjeva (OJT I.S.)</th>
-                                <th>ICMP Opaska</th>
-                                <th style="width: 250px;">Komentar / Datum izmjene</th>
-                                <th style="width: 90px; text-align: center;">Akcija</th>
+                                <th class="col-print-br" style="width: 100px;">Slučaj / ID</th>
+                                <th class="col-print-oznaka">
+                                    <span class="screen-only">Lokacija</span>
+                                    <span class="print-only">Oznaka slučaja / Lokacija / Identitet</span>
+                                </th>
+                                <th class="screen-only">Osoba / Identitet</th>
+                                <th class="col-print-preporuka">
+                                    <span class="screen-only">Status Zahtjeva (OJT I.S.)</span>
+                                    <span class="print-only">Preporuka INL BiH / Status (OJT I.S.)</span>
+                                </th>
+                                <th class="screen-only">ICMP Opaska</th>
+                                <th class="col-print-analiza" style="width: 250px;">
+                                    <span class="screen-only">Komentar / Datum izmjene</span>
+                                    <span class="print-only">Analiza INL BiH</span>
+                                </th>
+                                <th class="screen-only" style="width: 90px; text-align: center;">Akcija</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
+                </div>
+
+                <!-- PODNOŽJE SA IMENOM ULOGOVANOG KORISNIKA I VREMENOM ISPISA (SAMO ZA ŠTAMPU) -->
+                <div class="print-only print-footer-meta">
+                    <span>Dokument isprintao: <strong id="printAutorIme">-</strong></span>
+                    <span>Datum i vrijeme ispisa: <strong id="printVrijemeIspisa">-</strong></span>
                 </div>
             </div>
 
             <!-- DODATE TABELE NA KRAJU NAKON APPS SCRIPT TABELE -->
             
             <!-- TABELA 1: MATERIJAL ZA KOSTURNICU -->
-            <div class="card">
+            <div class="card no-print">
                 <h3 class="section-title">6. Slučajevi definirani kao materijal za kosturnicu</h3>
                 <p class="section-desc">
                     Kao posljedica procesa identifikacije tokom godina došlo je do akumuliranja fragmentarnog skeletnog materijala koji je smješten u kategoriju "materijala za kosturnicu" zbog nemogućnosti da se ovaj materijal poveže sa slučajevima ili osobama ili nemogućnosti izolovanja DNK. Revizijom je ustanovljeno 65 kompletnih slučajeva koje sada treba naznačiti kao materijal za kosturnicu.
@@ -297,7 +428,7 @@
             </div>
 
             <!-- TABELA 2: SLUČAJEVI BEZ PODUDARANJA PROFILA -->
-            <div class="card">
+            <div class="card no-print">
                 <h3 class="section-title">7. Slučajevi bez podudaranja profila</h3>
                 <p class="section-desc">
                     Određen broj slučajeva imaju profile DNK koji se ne podudaraju sa referentnim uzorcima krvi u trenutku pisanja ovog izvještaja, i koji su kako se čini prema raspoloživoj evidenciji povezani sa sukobom. Bilo je 17 takvih slučajeva. Sa analizom DNK koja je u toku te daljnjim prikupljanjem referentnih uzoraka krvi i testiranjem DNK, moguće je da se tokom vremena mogu naći daljnja podudaranja sa uzorcima navedenim u ovim slučajevima. Neki slučajevi mogu imati više profila DNK.
@@ -389,12 +520,27 @@
         </div>
     </div>
 
+    <!-- MODAL ZA PREGLED KO JE ŠTAMPAO -->
+    <div id="printLogModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--text-main);">📜 Evidencija ko je štampao dokument</h3>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin-top:0;">
+                Zabilježeni ispisi u ovom pregledniku (pozivi su poslani i prema Apps Script endpointu):
+            </p>
+            <div id="printLogList" class="log-list"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn-edit" style="background:var(--accent); color:white;" onclick="closePrintLogModal()">Zatvori</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyP9jaf8kULPUtZfhpW8bZ3MjyYY18XtyWtI5yD9i9OF0KexmUiEJq4UZnHVAezzVI/exec";
         let isSubmitting = false;
         let trenutniKorisnik = "";
         let sviSlucajevi = [];
         let aktivnaTabela = "appMain";
+        let evidencijaStampe = JSON.parse(localStorage.getItem("ino_print_log_istocno_sa") || "[]");
 
         const DEFAULT_PREPORUKA = "trajni ukop nakon očitovanja Tužilaštva";
 
@@ -414,14 +560,14 @@
             {br: "12", oznaka: "Donje Štitarevo 326 (4B)", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "13", oznaka: "Donje Štitarevo V-A 194", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "14", oznaka: "Đurevića Polje 209", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "15", oznaka: "Đurevića Polje 212", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "15", oznaka: "Đurevića Polje 212", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "16", oznaka: "Đurevića Polje 213", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "17", oznaka: "Đurevića Polje 360", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "18", oznaka: "Đurevića Polje Br.358", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "19", oznaka: "Đurevića Polje IX 162", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "20", oznaka: "Đurevića Polje VIII Br. 205 M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "21", oznaka: "Đurevića Polje-Višegrad 168", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "22", oznaka: "Đurevića Polje IX Br.163", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "21", oznaka: "Đurevića Polje-Višegrad 168", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "22", oznaka: "Đurevića Polje IX Br.163", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "23", oznaka: "Hrtar Grad 140", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "24", oznaka: "Hrtar Grad 141", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "25", oznaka: "Kurtalići 229", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
@@ -488,6 +634,31 @@
             {br: "17", oznaka: "Đurevića Polje IV br.67", uzorci: "KTE-21-10-67-LF<br>KTE-21-10-67-LH", preporukaIno: DEFAULT_PREPORUKA}
         ];
 
+        // Briše samo riječ/oznaku "DNK", a ostavlja sve oznake (KTE-..., KPP-..., KTA-..., KRI-..., NN-...) i komentar
+        function ocistiSamoDnk(tekst) {
+            if (!tekst) return '';
+            return String(tekst)
+                .replace(/\bDNK\b\s*[:\-–—]?\s*/gi, '')
+                .replace(/\s{2,}/g, ' ')
+                .trim();
+        }
+
+        function spojiAnalizuZaPrint(opaska, komentar) {
+            let cistaOpaska = ocistiSamoDnk(opaska);
+            if (cistaOpaska === '-' || cistaOpaska === '/') cistaOpaska = '';
+
+            let cistiKomentar = ocistiSamoDnk(komentar);
+            if (cistiKomentar === '-') cistiKomentar = '';
+
+            if (cistaOpaska && cistiKomentar) {
+                if (cistiKomentar.includes(cistaOpaska)) {
+                    return cistiKomentar;
+                }
+                return `${cistaOpaska}; ${cistiKomentar}`;
+            }
+            return cistaOpaska || cistiKomentar || '-';
+        }
+
         function handleLogin(e) {
             e.preventDefault();
             let fullname = document.getElementById('loginFullname').value.trim();
@@ -505,7 +676,7 @@
             btn.disabled = true;
             err.style.display = "none";
 
-            fetch(`${SCRIPT_URL}?action=login&fullname=${encodeURIComponent(fullname)}&password=${encodeURIComponent(pass)}`)
+            fetch(`${SCRIPT_URL}?action=login&fullname=${encodeURIComponent(fullname)}&password=${encodeURIComponent(pass)}`, { mode: 'no-cors' })
                 .catch(() => {});
 
             setTimeout(() => {
@@ -536,14 +707,23 @@
                 let isSent = item.status && item.status.includes("2025");
                 let tagClass = isSent ? "tag-sent" : ((item.status && item.status.includes("Odbijeno")) ? "tag-check" : "tag-pending");
 
+                let lokacijaOsobaPrint = [item.lokacija, item.osoba].filter(x => x && x !== '-').join(' — ') || '-';
+                let printAnaliza = spojiAnalizuZaPrint(item.opaska, item.komentar);
+
                 row.innerHTML = `
-                    <td><strong>${item.id}</strong></td>
-                    <td>${item.lokacija}</td>
-                    <td>${item.osoba}</td>
-                    <td><span class="tag ${tagClass}">${item.status}</span></td>
-                    <td><small style="color:var(--text-muted);">${item.opaska || '-'}</small></td>
-                    <td class="comment-cell">${item.komentar || '<span style="color:var(--text-muted); font-size:0.8rem;">— nema komentara —</span>'}</td>
-                    <td style="text-align: center;"><button class="btn-edit" onclick="openModal('${item.id}', '${item.status}', '${item.opaska || ''}', '${item.komentar || ''}')">✏️ Uredi</button></td>
+                    <td class="col-print-br"><strong>${item.id}</strong></td>
+                    <td class="col-print-oznaka">
+                        <span class="screen-only">${item.lokacija}</span>
+                        <span class="print-only">${lokacijaOsobaPrint}</span>
+                    </td>
+                    <td class="screen-only">${item.osoba}</td>
+                    <td class="col-print-preporuka"><span class="tag ${tagClass}">${item.status}</span></td>
+                    <td class="screen-only"><small style="color:var(--text-muted);">${item.opaska || '-'}</small></td>
+                    <td class="comment-cell col-print-analiza">
+                        <span class="screen-only">${item.komentar || '<span style="color:var(--text-muted); font-size:0.8rem;">— nema komentara —</span>'}</span>
+                        <span class="print-only">${printAnaliza}</span>
+                    </td>
+                    <td class="screen-only" style="text-align: center;"><button class="btn-edit" onclick="openModalById('${item.id}')">✏️ Uredi</button></td>
                 `;
             });
         }
@@ -583,6 +763,12 @@
                 let text = row.innerText.toLowerCase();
                 row.style.display = text.includes(input) ? '' : 'none';
             });
+        }
+
+        function openModalById(id) {
+            let item = sviSlucajevi.find(x => String(x.id) === String(id));
+            if (!item) return;
+            openModal(item.id, item.status || '', item.opaska || '', item.komentar || '');
         }
 
         function openModal(id, trenStatus, trenOpaska, postojeciKomentar) {
@@ -718,8 +904,57 @@
 
         function generisiPDF() {
             let imeKorisnika = trenutniKorisnik || "Mirza Saračević";
-            fetch(`${SCRIPT_URL}?action=logPrint&autor=${encodeURIComponent(imeKorisnika)}`).catch(() => {});
-            window.print();
+            let vrijemeSada = new Date().toLocaleString("bs-BA");
+
+            // 1. Popunjava potpis i vrijeme na dnu dokumenta koji se štampa
+            document.getElementById('printAutorIme').innerText = imeKorisnika;
+            document.getElementById('printVrijemeIspisa').innerText = vrijemeSada;
+
+            // 2. Čuva lokalni zapis u pregledniku (za dugme "📜 Pregled štampe")
+            evidencijaStampe.unshift({ korisnik: imeKorisnika, vrijeme: vrijemeSada });
+            localStorage.setItem("ino_print_log_istocno_sa", JSON.stringify(evidencijaStampe));
+
+            // 3. Šalje poziv na postojeći SCRIPT_URL (bez diranja Apps Script koda)
+            let params = new URLSearchParams({
+                action: "updateRecord",
+                id: "PRINT_LOG",
+                br: "PRINT_LOG",
+                autor: imeKorisnika,
+                fullname: imeKorisnika,
+                vrijeme: vrijemeSada,
+                status: "ISPRINTAO DOKUMENT",
+                opaska: "Štampa izvještaja — OJT Istočno Sarajevo",
+                komentar: `Dokument isprintao: ${imeKorisnika} (${vrijemeSada})`
+            });
+
+            let iframe = document.getElementById('hidden_iframe');
+            if (iframe) {
+                iframe.src = `${SCRIPT_URL}?${params.toString()}`;
+            }
+            fetch(`${SCRIPT_URL}?${params.toString()}`, { mode: 'no-cors' }).catch(() => {});
+
+            // 4. Pokreće prozor za štampu / PDF
+            setTimeout(() => {
+                window.print();
+            }, 150);
+        }
+
+        function openPrintLogModal() {
+            let listEl = document.getElementById('printLogList');
+            if (!evidencijaStampe.length) {
+                listEl.innerHTML = `<div class="log-item" style="color:var(--text-muted);">Još nema zabilježenih ispisa u ovom pregledniku.</div>`;
+            } else {
+                listEl.innerHTML = evidencijaStampe.map((entry, idx) => `
+                    <div class="log-item">
+                        <strong>#${evidencijaStampe.length - idx}</strong> — <strong>${entry.korisnik}</strong> je isprintao dokument u <span>${entry.vrijeme}</span>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('printLogModal').style.display = 'flex';
+        }
+
+        function closePrintLogModal() {
+            document.getElementById('printLogModal').style.display = 'none';
         }
 
         function loadData() {
