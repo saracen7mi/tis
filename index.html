@@ -230,7 +230,10 @@
                 box-shadow: none !important; 
                 background: #ffffff !important; 
                 padding: 0 !important; 
-                margin: 0 !important; 
+                margin: 18px 0 0 0 !important; 
+            }
+            .card:first-child {
+                margin-top: 0 !important;
             }
             .print-header-title {
                 text-align: center;
@@ -242,25 +245,48 @@
                 max-width: 90%;
                 color: #000000 !important;
             }
+            .section-title {
+                color: #000000 !important;
+                border-bottom: 1px solid #000000 !important;
+                font-size: 11.5pt !important;
+                page-break-after: avoid;
+            }
+            .section-desc {
+                color: #000000 !important;
+                font-size: 9.5pt !important;
+            }
+            .recommendations-box {
+                background: #ffffff !important;
+                border: 1px solid #000000 !important;
+                color: #000000 !important;
+                font-size: 9.5pt !important;
+                page-break-inside: avoid;
+            }
+            .recommendations-box h4, .recommendations-box ul, .recommendations-box li {
+                color: #000000 !important;
+            }
             .table-responsive { 
                 max-height: none !important; 
                 overflow: visible !important; 
                 border: none !important; 
             }
-            table#tblSlucajevi { 
+            table { 
                 width: 100% !important; 
-                font-size: 10pt !important; 
+                font-size: 9.5pt !important; 
                 color: #000000 !important; 
                 border-collapse: collapse !important; 
+            }
+            table#tblSlucajevi { 
+                font-size: 10pt !important; 
                 table-layout: fixed;
             }
-            #tblSlucajevi thead {
+            thead {
                 display: table-header-group;
             }
-            #tblSlucajevi tr {
+            tr {
                 page-break-inside: avoid;
             }
-            #tblSlucajevi th, #tblSlucajevi td { 
+            th, td { 
                 border: 1px solid #000000 !important; 
                 padding: 6px 8px !important; 
                 color: #000000 !important; 
@@ -271,28 +297,29 @@
                 position: static !important;
                 word-wrap: break-word;
             }
-            #tblSlucajevi th { 
+            th { 
                 background-color: #f2f2f2 !important; 
                 font-weight: bold !important; 
                 text-transform: none !important;
-                font-size: 10pt !important;
+                font-size: 9.5pt !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+            #tblSlucajevi th { font-size: 10pt !important; }
             #tblSlucajevi th.col-print-br, #tblSlucajevi td.col-print-br { width: 8% !important; }
             #tblSlucajevi th.col-print-oznaka, #tblSlucajevi td.col-print-oznaka { width: 22% !important; }
             #tblSlucajevi th.col-print-analiza, #tblSlucajevi td.col-print-analiza { width: 48% !important; }
             #tblSlucajevi th.col-print-preporuka, #tblSlucajevi td.col-print-preporuka { width: 22% !important; text-align: left !important; }
 
-            #tblSlucajevi .tag {
+            .tag {
                 background: transparent !important;
                 border: none !important;
                 color: #000000 !important;
                 padding: 0 !important;
                 font-weight: normal !important;
-                font-size: 10pt !important;
                 border-radius: 0 !important;
             }
+            #tblSlucajevi .tag { font-size: 10pt !important; }
 
             .print-footer-meta {
                 margin-top: 18px;
@@ -302,6 +329,7 @@
                 justify-content: space-between;
                 font-size: 9.5pt;
                 color: #000000 !important;
+                page-break-inside: avoid;
             }
         }
     </style>
@@ -386,18 +414,12 @@
                         <tbody></tbody>
                     </table>
                 </div>
-
-                <!-- PODNOŽJE SA IMENOM ULOGOVANOG KORISNIKA I VREMENOM ISPISA (SAMO ZA ŠTAMPU) -->
-                <div class="print-only print-footer-meta">
-                    <span>Dokument isprintao: <strong id="printAutorIme">-</strong></span>
-                    <span>Datum i vrijeme ispisa: <strong id="printVrijemeIspisa">-</strong></span>
-                </div>
             </div>
 
             <!-- DODATE TABELE NA KRAJU NAKON APPS SCRIPT TABELE -->
             
             <!-- TABELA 1: MATERIJAL ZA KOSTURNICU -->
-            <div class="card no-print">
+            <div class="card">
                 <h3 class="section-title">6. Slučajevi definirani kao materijal za kosturnicu</h3>
                 <p class="section-desc">
                     Kao posljedica procesa identifikacije tokom godina došlo je do akumuliranja fragmentarnog skeletnog materijala koji je smješten u kategoriju "materijala za kosturnicu" zbog nemogućnosti da se ovaj materijal poveže sa slučajevima ili osobama ili nemogućnosti izolovanja DNK. Revizijom je ustanovljeno 65 kompletnih slučajeva koje sada treba naznačiti kao materijal za kosturnicu.
@@ -411,7 +433,7 @@
                                 <th style="width: 200px;">Oznaka slučaja</th>
                                 <th>Komentar</th>
                                 <th style="width: 260px;">Preporuka INO </th>
-                                <th style="width: 75px; text-align: center;">Akcija</th>
+                                <th class="screen-only" style="width: 75px; text-align: center;">Akcija</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -428,7 +450,7 @@
             </div>
 
             <!-- TABELA 2: SLUČAJEVI BEZ PODUDARANJA PROFILA -->
-            <div class="card no-print">
+            <div class="card">
                 <h3 class="section-title">7. Slučajevi bez podudaranja profila</h3>
                 <p class="section-desc">
                     Određen broj slučajeva imaju profile DNK koji se ne podudaraju sa referentnim uzorcima krvi u trenutku pisanja ovog izvještaja, i koji su kako se čini prema raspoloživoj evidenciji povezani sa sukobom. Bilo je 17 takvih slučajeva. Sa analizom DNK koja je u toku te daljnjim prikupljanjem referentnih uzoraka krvi i testiranjem DNK, moguće je da se tokom vremena mogu naći daljnja podudaranja sa uzorcima navedenim u ovim slučajevima. Neki slučajevi mogu imati više profila DNK.
@@ -442,7 +464,7 @@
                                 <th style="width: 190px;">Oznaka slučaja</th>
                                 <th style="width: 190px;">DNA uzorci</th>
                                 <th style="width: 260px;">Preporuka INO (trajni ukop nakon očitovanja Tužilaštva)</th>
-                                <th style="width: 75px; text-align: center;">Akcija</th>
+                                <th class="screen-only" style="width: 75px; text-align: center;">Akcija</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -456,6 +478,12 @@
                         <li>Trebalo bi poduzeti daljnju istragu u vezi sa ovim slučajevima kako bi se utvrdilo da li je moguće prikupiti još referentnih uzoraka krvi i pronaći podudaranja.</li>
                         <li>Preporuka je da bi ovi slučajevi trebali ostati smješteni u mrtvačnicama i da ne bi trebali biti ukopani dok se obavljaju daljnje istražne radnje i aktivno prikupljanje referentnih uzoraka krvi.</li>
                     </ul>
+                </div>
+
+                <!-- PODNOŽJE SA IMENOM ULOGOVANOG KORISNIKA I VREMENOM ISPISA (SAMO ZA ŠTAMPU) -->
+                <div class="print-only print-footer-meta">
+                    <span>Dokument isprintao: <strong id="printAutorIme">-</strong></span>
+                    <span>Datum i vrijeme ispisa: <strong id="printVrijemeIspisa">-</strong></span>
                 </div>
             </div>
 
@@ -557,46 +585,46 @@
             {br: "9", oznaka: "Donje Štitarevo 305", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "10", oznaka: "Donje Štitarevo 306", komentar: "Slučaj ne sadrži skeletni materijal pogodan za ponovno podnošenje uzorka...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "11", oznaka: "Donje Štitarevo 308", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "12", oznaka: "Donje Štitarevo 326 (4B)", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "12", oznaka: "Donje Štitarevo 326 (4B)", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "13", oznaka: "Donje Štitarevo V-A 194", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "14", oznaka: "Đurevića Polje 209", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "15", oznaka: "Đurevića Polje 212", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "15", oznaka: "Đurevića Polje 212", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "16", oznaka: "Đurevića Polje 213", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "17", oznaka: "Đurevića Polje 360", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "18", oznaka: "Đurevića Polje Br.358", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "19", oznaka: "Đurevića Polje IX 162", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "20", oznaka: "Đurevića Polje VIII Br. 205 M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "21", oznaka: "Đurevića Polje-Višegrad 168", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "22", oznaka: "Đurevića Polje IX Br.163", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "20", oznaka: "Đurevića Polje VIII Br. 205 M-K", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "21", oznaka: "Đurevića Polje-Višegrad 168", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "22", oznaka: "Đurevića Polje IX Br.163", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "23", oznaka: "Hrtar Grad 140", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "24", oznaka: "Hrtar Grad 141", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "25", oznaka: "Kurtalići 229", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "26", oznaka: "Kurtalići 235", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "26", oznaka: "Kurtalići 235", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "27", oznaka: "Kurtalići 236", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "28", oznaka: "Kurtalići 237", komentar: "Prethodno uzeti uzorak za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "28", oznaka: "Kurtalići 237", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "29", oznaka: "Kurtalići 243", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "30", oznaka: "Kurtalići 248", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "31", oznaka: "Lugova Ravan Br. 320", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "32", oznaka: "Miloševići 221", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "33", oznaka: "Miloševići 224", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "34", oznaka: "Miloševići 225 M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "35", oznaka: "Miloševići, Višegrad 56", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "36", oznaka: "Nikolići - 3 178", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "37", oznaka: "Nikolići 338", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "31", oznaka: "Lugova Ravan Br. 320", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "32", oznaka: "Miloševići 221", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "33", oznaka: "Miloševići 224", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "34", oznaka: "Miloševići 225 M-K", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "35", oznaka: "Miloševići, Višegrad 56", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "36", oznaka: "Nikolići - 3 178", komentar: "Svi uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "37", oznaka: "Nikolići 338", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "38", oznaka: "Nikolići III B 296", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "39", oznaka: "Nikolići, Višegrad IV 60", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "40", oznaka: "Nikolići-4 170", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "41", oznaka: "Nikolići (2A) 182", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "42", oznaka: "Nikolići-3 179", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "39", oznaka: "Nikolići, Višegrad IV 60", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "40", oznaka: "Nikolići-4 170", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "41", oznaka: "Nikolići (2A) 182", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "42", oznaka: "Nikolići-3 179", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "43", oznaka: "Paočići 286", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "44", oznaka: "Paočići 292", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "45", oznaka: "Paočići Br. 191", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "46", oznaka: "Paočići Br. 193", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "45", oznaka: "Paočići Br. 191", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "46", oznaka: "Paočići Br. 193", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "47", oznaka: "Skela IA 203", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "48", oznaka: "Skela-1-B 278-M-K", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "48", oznaka: "Skela-1-B 278-M-K", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "49", oznaka: "Slap 317", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "50", oznaka: "Stari Brod - Rogatica - Sektor A 90", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "51", oznaka: "Stari Brod - Rogatica 84 sektor B", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "50", oznaka: "Stari Brod - Rogatica - Sektor A 90", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "51", oznaka: "Stari Brod - Rogatica 84 sektor B", komentar: "Prethodno uzeti uzorci za DNK analizu nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "52", oznaka: "Stari Brod 101", komentar: "Ovaj slučaj nije prethodno uzorkovan za analizu DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "53", oznaka: "Stari Brod 106", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "54", oznaka: "Stari Brod 107", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
@@ -607,7 +635,7 @@
             {br: "59", oznaka: "Stari Brod 77", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "60", oznaka: "Stari Brod 97", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "61", oznaka: "Stari Brod Sektor A BR. 80", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
-            {br: "62", oznaka: "Stari Brod, Rogatica 83", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
+            {br: "62", oznaka: "Stari Brod, Rogatica 83", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "63", oznaka: "STARI BROD SEKTOR C Br.363", komentar: "Svi uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "64", oznaka: "Vidojeva Stijenčica br.3", komentar: "Prethodno uzeti uzorci za analizu DNK nisu uspjeli osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA},
             {br: "65", oznaka: "Stečci 169", komentar: "Prethodno uzeti uzorak za analizu DNK nije uspio osigurati profil DNK...", preporukaIno: DEFAULT_PREPORUKA}
@@ -720,7 +748,7 @@
                     <td>${item.oznaka}</td>
                     <td style="color:#d1d5db; font-style:italic;">${item.komentar || '-'}</td>
                     <td style="color:#93c5fd; font-weight:500;">${item.preporukaIno || DEFAULT_PREPORUKA}</td>
-                    <td style="text-align: center;"><button class="btn-edit" onclick="openEditModal('kosturnica', '${item.br}')">✏️ Uredi</button></td>
+                    <td class="screen-only" style="text-align: center;"><button class="btn-edit" onclick="openEditModal('kosturnica', '${item.br}')">✏️ Uredi</button></td>
                 `;
             });
 
@@ -733,7 +761,7 @@
                     <td>${item.oznaka}</td>
                     <td><code>${item.uzorci || '-'}</code></td>
                     <td style="color:#93c5fd; font-weight:500;">${item.preporukaIno || DEFAULT_PREPORUKA}</td>
-                    <td style="text-align: center;"><button class="btn-edit" onclick="openEditModal('bezPodudaranja', '${item.br}')">✏️ Uredi</button></td>
+                    <td class="screen-only" style="text-align: center;"><button class="btn-edit" onclick="openEditModal('bezPodudaranja', '${item.br}')">✏️ Uredi</button></td>
                 `;
             });
         }
