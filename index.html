@@ -280,8 +280,8 @@
                 print-color-adjust: exact;
             }
             #tblSlucajevi th.col-print-br, #tblSlucajevi td.col-print-br { width: 8% !important; }
-            #tblSlucajevi th.col-print-oznaka, #tblSlucajevi td.col-print-oznaka { width: 24% !important; }
-            #tblSlucajevi th.col-print-analiza, #tblSlucajevi td.col-print-analiza { width: 46% !important; }
+            #tblSlucajevi th.col-print-oznaka, #tblSlucajevi td.col-print-oznaka { width: 22% !important; }
+            #tblSlucajevi th.col-print-analiza, #tblSlucajevi td.col-print-analiza { width: 48% !important; }
             #tblSlucajevi th.col-print-preporuka, #tblSlucajevi td.col-print-preporuka { width: 22% !important; text-align: left !important; }
 
             #tblSlucajevi .tag {
@@ -368,12 +368,12 @@
                                 <th class="col-print-br" style="width: 100px;">Slučaj / ID</th>
                                 <th class="col-print-oznaka">
                                     <span class="screen-only">Lokacija</span>
-                                    <span class="print-only">Oznaka slučaja / Lokacija / Identitet</span>
+                                    <span class="print-only">Oznaka slučaja</span>
                                 </th>
                                 <th class="screen-only">Osoba / Identitet</th>
                                 <th class="col-print-preporuka">
                                     <span class="screen-only">Status Zahtjeva (OJT I.S.)</span>
-                                    <span class="print-only">Preporuka INL BiH / Status (OJT I.S.)</span>
+                                    <span class="print-only">Preporuka INL BiH</span>
                                 </th>
                                 <th class="screen-only">ICMP Opaska</th>
                                 <th class="col-print-analiza" style="width: 250px;">
@@ -634,29 +634,15 @@
             {br: "17", oznaka: "Đurevića Polje IV br.67", uzorci: "KTE-21-10-67-LF<br>KTE-21-10-67-LH", preporukaIno: DEFAULT_PREPORUKA}
         ];
 
-        // Briše samo riječ/oznaku "DNK", a ostavlja sve oznake (KTE-..., KPP-..., KTA-..., KRI-..., NN-...) i komentar
-        function ocistiSamoDnk(tekst) {
-            if (!tekst) return '';
-            return String(tekst)
-                .replace(/\bDNK\b\s*[:\-–—]?\s*/gi, '')
-                .replace(/\s{2,}/g, ' ')
-                .trim();
-        }
+        // Spaja Osoba/Identitet + Komentar/Datum izmjene za kolonu "Analiza INL BiH" u štampi (bez ICMP opaske)
+        function spojiOsobuIKomentarZaPrint(osoba, komentar) {
+            let cistaOsoba = (osoba && String(osoba).trim() !== '-' && String(osoba).trim() !== '/') ? String(osoba).trim() : '';
+            let cistiKomentar = (komentar && String(komentar).trim() !== '-') ? String(komentar).trim() : '';
 
-        function spojiAnalizuZaPrint(opaska, komentar) {
-            let cistaOpaska = ocistiSamoDnk(opaska);
-            if (cistaOpaska === '-' || cistaOpaska === '/') cistaOpaska = '';
-
-            let cistiKomentar = ocistiSamoDnk(komentar);
-            if (cistiKomentar === '-') cistiKomentar = '';
-
-            if (cistaOpaska && cistiKomentar) {
-                if (cistiKomentar.includes(cistaOpaska)) {
-                    return cistiKomentar;
-                }
-                return `${cistaOpaska}; ${cistiKomentar}`;
+            if (cistaOsoba && cistiKomentar) {
+                return `${cistaOsoba} — ${cistiKomentar}`;
             }
-            return cistaOpaska || cistiKomentar || '-';
+            return cistaOsoba || cistiKomentar || '-';
         }
 
         function handleLogin(e) {
@@ -707,17 +693,13 @@
                 let isSent = item.status && item.status.includes("2025");
                 let tagClass = isSent ? "tag-sent" : ((item.status && item.status.includes("Odbijeno")) ? "tag-check" : "tag-pending");
 
-                let lokacijaOsobaPrint = [item.lokacija, item.osoba].filter(x => x && x !== '-').join(' — ') || '-';
-                let printAnaliza = spojiAnalizuZaPrint(item.opaska, item.komentar);
+                let printAnaliza = spojiOsobuIKomentarZaPrint(item.osoba, item.komentar);
 
                 row.innerHTML = `
                     <td class="col-print-br"><strong>${item.id}</strong></td>
-                    <td class="col-print-oznaka">
-                        <span class="screen-only">${item.lokacija}</span>
-                        <span class="print-only">${lokacijaOsobaPrint}</span>
-                    </td>
-                    <td class="screen-only">${item.osoba}</td>
-                    <td class="col-print-preporuka"><span class="tag ${tagClass}">${item.status}</span></td>
+                    <td class="col-print-oznaka">${item.lokacija || '-'}</td>
+                    <td class="screen-only">${item.osoba || '-'}</td>
+                    <td class="col-print-preporuka"><span class="tag ${tagClass}">${item.status || '-'}</span></td>
                     <td class="screen-only"><small style="color:var(--text-muted);">${item.opaska || '-'}</small></td>
                     <td class="comment-cell col-print-analiza">
                         <span class="screen-only">${item.komentar || '<span style="color:var(--text-muted); font-size:0.8rem;">— nema komentara —</span>'}</span>
